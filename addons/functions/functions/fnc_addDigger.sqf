@@ -54,7 +54,7 @@ private _condition = if (!isNil "_diggingType" && {_diggingType == "DOWN"}) then
 [
     {
         params ["_args", "_handle"];
-        _args params ["_unit", "_trench", "_condition","_finishCondition"];
+        _args params ["_unit", "_trench", "_condition","_finishCondition", "_nextFatigueTime"];
 
         if (isNull _trench || {[_trench] call _condition} || {!alive _unit}) exitWith {
 
@@ -82,11 +82,14 @@ private _condition = if (!isNil "_diggingType" && {_diggingType == "DOWN"}) then
             [QGVAR(handleDiggerToGVAR), [_trench, _unit, true]] call CBA_fnc_serverEvent;
         };
 
-        // Fatigue impact
-        [QGVAR(applyFatigue), [_trench, _unit], _unit] call CBA_fnc_targetEvent;
+        // Fatigue impact, throttled to once per second like the main digger (PFH runs every 0.1s)
+        if (CBA_missionTime >= _nextFatigueTime) then {
+            _args set [4, CBA_missionTime + 1];
+            [QGVAR(applyFatigue), [_trench, _unit], _unit] call CBA_fnc_targetEvent;
+        };
     },
     0.1,
-    [_unit, _trench, _condition, _finishCondition]
+    [_unit, _trench, _condition, _finishCondition, CBA_missionTime + 1]
 ] call CBA_fnc_addPerFrameHandler;
 
 // Create progress bar
