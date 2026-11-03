@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Setup HEMTT
       uses: arma-actions/hemtt@v1
@@ -20,7 +20,7 @@ jobs:
       run: mv .hemttout/build .hemttout/@grad_trenches
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: grad-trenches-${{ github.sha }}
         path: .hemttout/@*
